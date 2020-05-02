@@ -64,21 +64,24 @@ let size =
 (* A list of pairs [m, n], where [m] is the number of tests and [n] is the
    size of the randomly generated terms. *)
 
-let pairs = [
-  100000, 5;
-  100000, 10; (*
-  100000, 15;
-  100000, 20;
-  100000, 25; (* at this size, about 1% of the terms are well-typed *)
-  100000, 30;
-  (* At the following sizes, no terms are well-typed! *)
-   10000, 100;
-   10000, 500;
-    1000, 1000;
-     100, 10000;
+let pairs =
+  match Sys.getenv_opt "INFERNO_SLOW_TESTS" with
+  | Some ("0" | "false" | "") | None -> []
+  | Some _ -> [
+      100000, 5;
+      100000, 10;
+      100000, 15;
+      100000, 20;
+      100000, 25; (* at this size, about 1% of the terms are well-typed *)
+      100000, 30;
+      (* At the following sizes, no terms are well-typed! *)
+      10000, 100;
+      10000, 500;
+      1000, 1000;
+      100, 10000;
       10, 100000;
-       1, 1000000; *)
-]
+      1, 1000000;
+    ]
 
 let () =
   Printf.printf "Preparing to type-check a bunch of randomly-generated terms...\n%!";
