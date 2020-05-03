@@ -1,20 +1,5 @@
 (library
   (name client)
   (libraries pprint inferno)
-  (modules (:standard \ HandWrittenTest RandomTest))
-  (flags "-w" "@1..66-4-44")
-)
-
-(test
-  (name HandWrittenTest)
-  (libraries client)
-  (modules HandWrittenTest)
-  (flags "-w" "@1..66-4-44")
-)
-
-(test
-  (name RandomTest)
-  (libraries client)
-  (modules RandomTest)
   (flags "-w" "@1..66-4-44")
 )

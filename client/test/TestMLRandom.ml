@@ -87,11 +87,11 @@ let () =
   let d = ref 0 in
   List.iter (fun (m, n) ->
     for i = 1 to m do
-      if Test.verbose then
+      if Test.Config.verbose then
         Printf.printf "Test number %d...\n%!" i;
       let t = random_ml_term 0 n in
       assert (size t = n);
-      let success = Test.test t in
+      let success = Test.CheckML.test t in
       if success then incr c;
       incr d
     done
