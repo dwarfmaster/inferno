@@ -112,15 +112,15 @@ let print_type ty =
 
 let translate t =
   try
-    Some (Client.translate t)
+    Some (Infer.translate t)
   with
-  | Client.Cycle ty ->
+  | Infer.Cycle ty ->
       if verbose then begin
         Printf.fprintf stdout "Type error: a cyclic type arose.\n";
         print_type ty
       end;
       None
-  | Client.Unify (ty1, ty2) ->
+  | Infer.Unify (ty1, ty2) ->
       if verbose then begin
         Printf.fprintf stdout "Type error: type mismatch.\n";
         Printf.fprintf stdout "Type error: mismatch between the type:\n";
