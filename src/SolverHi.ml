@@ -98,7 +98,7 @@ let (^^) (rc1, k1) (rc2, k2) =
     let _ = k1 env in
     k2 env
 
-(* The type ['a f] does not form a monad. Indeed, there is no way of defining
+(* The type ['a co] does not form a monad. Indeed, there is no way of defining
    a [bind] combinator. *)
 
 (* A note on syntax. We need [--] to bind tighter than [^&], which in turn
