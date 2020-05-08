@@ -239,20 +239,28 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       flet (x, coerce a b (F.Var x),
       u'))
 
-    (* Pair. *)
-  | ML.Pair (t1, t2) ->
-
-      exist_ (fun v1 ->
-        exist_ (fun v2 ->
-          (* [w] must be the product type [v1 * v2]. *)
-          w --- product [v1; v2] ^^
-          (* [t1] must have type [t1], and [t2] must have type [t2]. *)
-          hastype t1 v1 ^&
-          hastype t2 v2
-        )
-      ) <$$> fun (t1, t2) ->
+  | ML.Tuple ts ->
+      begin
+        let rec traverse
+            (ts : ML.term list)
+            (k : variable list -> 'a co)
+        : (F.nominal_term list * 'a) co =
+          match ts with
+          | [] ->
+            map (fun r -> ([], r)) @@
+            k []
+          | t::ts ->
+            exist_ @@ fun v ->
+            map (fun (t', (ts', r)) -> (t'::ts', r)) @@
+            hastype t v ^&
+            traverse ts @@ fun vs ->
+            k (v :: vs)
+        in
+        traverse ts @@ fun vs ->
+        w --- product vs
+      end <$$> fun (ts', ()) ->
       (* The System F term. *)
-      F.Tuple [t1; t2]
+      F.Tuple ts'
 
   | ML.LetProd (xs, t, u) ->
     begin

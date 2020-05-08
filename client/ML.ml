@@ -10,5 +10,5 @@ type term =
   | Abs of tevar * term
   | App of term * term
   | Let of tevar * term * term
-  | Pair of term * term
+  | Tuple of term list
   | LetProd of tevar list * term * term

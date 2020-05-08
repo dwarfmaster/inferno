@@ -34,7 +34,7 @@ let rec random_ml_term k n =
       ML.App (random_ml_term k n1, random_ml_term k n2)
     else if c = 2 then
       let n1, n2 = split (n - 1) in
-      ML.Pair (random_ml_term k n1, random_ml_term k n2)
+      ML.Tuple [random_ml_term k n1; random_ml_term k n2]
     else if c = 3 then
       let n1, n2 = split (n - 1) in
       ML.Let (int2var k, random_ml_term k n1, random_ml_term (k + 1) n2)
@@ -52,9 +52,10 @@ let rec size accu = function
     -> size (accu + 1) t
   | ML.App (t1, t2)
   | ML.Let (_, t1, t2)
-  | ML.Pair (t1, t2)
   | ML.LetProd (_, t1, t2)
     -> size (size (accu + 1) t1) t2
+  | ML.Tuple ts
+    -> List.fold_left size (accu + 1) ts
 
 let size =
   size 0
