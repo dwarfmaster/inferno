@@ -24,7 +24,7 @@ let rec random_ml_term k n =
     ML.Var (int2var (Random.int k))
   end
   else
-    let c = Random.int 4 (* Abs, App, Pair, Let *) in
+    let c = Random.int 5 (* Abs, App, Pair, Let, LetProd *) in
     if k = 0 || c = 0 then
       (* The next available variable is [k]. *)
       let x, k = int2var k, k + 1 in
@@ -38,6 +38,10 @@ let rec random_ml_term k n =
     else if c = 3 then
       let n1, n2 = split (n - 1) in
       ML.Let (int2var k, random_ml_term k n1, random_ml_term (k + 1) n2)
+    else if c = 4 then
+      let n1, n2 = split (n - 1) in
+      let x1, x2, k' = int2var k, int2var (k + 1), k + 2 in
+      ML.LetProd ([x1; x2], random_ml_term k n1, random_ml_term k' n2)
     else
       assert false
 
@@ -49,6 +53,7 @@ let rec size accu = function
   | ML.App (t1, t2)
   | ML.Let (_, t1, t2)
   | ML.Pair (t1, t2)
+  | ML.LetProd (_, t1, t2)
     -> size (size (accu + 1) t1) t2
 
 let size =

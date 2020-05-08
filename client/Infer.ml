@@ -254,6 +254,24 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       (* The System F term. *)
       F.Tuple [t1; t2]
 
+  | ML.LetProd (xs, t, u) ->
+    begin
+      let rec traverse : 'a . string list -> (variable list -> 'a co) -> 'a co
+      = fun xs k -> match xs with
+      | [] ->
+        k []
+      | x::xs ->
+        exist_ @@ fun v ->
+        def x v @@
+        traverse xs @@ fun vs ->
+        k (v :: vs)
+      in
+      traverse xs @@ fun vs ->
+      lift hastype t (product vs) ^&
+      hastype u w
+    end <$$> fun (t', u') ->
+    F.LetProd(xs, t', u')
+
 (* The top-level wrapper uses [let0]. It does not require an expected
    type; it creates its own using [exist]. And it runs the solver. *)
 

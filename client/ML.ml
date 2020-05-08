@@ -11,3 +11,4 @@ type term =
   | App of term * term
   | Let of tevar * term * term
   | Pair of term * term
+  | LetProd of tevar list * term * term
