@@ -98,13 +98,6 @@ let arrow x y =
 let product x y =
   S.TyProduct (x, y)
 
-let product_i i x y =
-  assert (i = 1 || i = 2);
-  if i = 1 then
-    product x y
-  else
-    product y x
-
 (* Should we use smart constructors to eliminate redundant coercions when possible? *)
 let smart =
   true
@@ -258,14 +251,6 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       ) <$$> fun (t1, t2) ->
       (* The System F term. *)
       F.Tuple [t1; t2]
-
-    (* Projection. *)
-  | ML.Proj (i, t) ->
-
-      exist_ (fun other ->
-        lift hastype t (product_i i w other)
-      ) <$$> fun t ->
-      F.Proj (i, t)
 
 (* The top-level wrapper uses [let0]. It does not require an expected
    type; it creates its own using [exist]. And it runs the solver. *)

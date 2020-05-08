@@ -11,5 +11,3 @@ type term =
   | App of term * term
   | Let of tevar * term * term
   | Pair of term * term
-  | Proj of int * term
-
