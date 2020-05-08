@@ -45,6 +45,7 @@ type ('a, 'b) term =
   | TyApp of ('a, 'b) term * ('a, 'b) typ
   | Tuple of ('a, 'b) term list
   | Proj of int * ('a, 'b) term
+  | LetProd of tevar list * ('a, 'b) term * ('a, 'b) term
 
 type nominal_term = (tyvar, tyvar) term
 
@@ -158,6 +159,10 @@ module TypeInTerm : DeBruijn.TRAVERSE
     | Proj (i, t) ->
         let t' = traverse lookup extend env t in
         Proj (i, t')
+    | LetProd (xs, t1, t2) ->
+        let t1' = traverse lookup extend env t1
+        and t2' = traverse lookup extend env t2 in
+        LetProd (xs, t1', t2')
 
 end
 

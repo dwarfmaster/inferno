@@ -60,6 +60,11 @@ let print_tuple print_elem elems =
         separate_map (comma ^^ space) print_elem elems in
   surround 2 0 lparen contents rparen
 
+let print_let_in lhs rhs body =
+  string "let " ^^ lhs
+  ^^ string " = " ^^ rhs
+  ^^ string " in " ^^ body
+
 let rec print_term_aux level t =
   assert (level >= 0);
   match t with
@@ -92,12 +97,10 @@ let rec print_term_aux level t =
         parens (print_term t)
   | Let (x, t1, t2) ->
       if level >= 2 then
-        string "let " ^^
-        string x ^^
-        string " = " ^^
-        print_term t1 ^^
-        string " in " ^^
-        print_term_aux 2 t2
+        print_let_in
+          (string x)
+          (print_term t1)
+          (print_term_aux 2 t2)
       else
         parens (print_term t)
   | TyAbs (x, t1) ->
@@ -117,6 +120,14 @@ let rec print_term_aux level t =
         OCaml.int i ^^
         space ^^
         print_term_aux 0 t2
+      else
+        parens (print_term t)
+  | LetProd (xs, t1, t2) ->
+      if level >= 2 then
+        print_let_in
+          (print_tuple string xs)
+          (print_term t1)
+          (print_term_aux 2 t2)
       else
         parens (print_term t)
  

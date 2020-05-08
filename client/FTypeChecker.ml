@@ -181,6 +181,10 @@ let rec typeof env (t : debruijn_term) : debruijn_type =
       let ty = typeof env t in
       let tys = as_product ty in
       nth_type tys (i-1)
+  | LetProd (xs, t, u) ->
+      let tys = as_product (typeof env t) in
+      let env = List.fold_left2 extend_with_tevar env xs tys in
+      typeof env u
 
 let typeof =
   typeof empty

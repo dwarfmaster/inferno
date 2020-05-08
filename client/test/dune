@@ -6,6 +6,12 @@
 )
 
 (test
+  (name TestF)
+  (libraries client test)
+  (modules TestF)
+)
+
+(test
   (name TestML)
   (libraries client test)
   (modules TestML)
