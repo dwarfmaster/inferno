@@ -66,21 +66,24 @@ let size =
 
 let pairs =
   match Sys.getenv_opt "INFERNO_SLOW_TESTS" with
-  | Some ("0" | "false" | "") | None -> []
+  | Some ("0" | "false" | "") | None -> [
+      10_000, 10;
+      10_000, 15;
+    ]
   | Some _ -> [
-      100000, 5;
-      100000, 10;
-      100000, 15;
-      100000, 20;
-      100000, 25; (* at this size, about 1% of the terms are well-typed *)
-      100000, 30;
+      100_000, 5;
+      100_000, 10;
+      100_000, 15;
+      100_000, 20;
+      100_000, 25; (* at this size, about 1% of the terms are well-typed *)
+      100_000, 30;
       (* At the following sizes, no terms are well-typed! *)
-      10000, 100;
-      10000, 500;
+      10_000, 100;
+      10_000, 500;
       1000, 1000;
-      100, 10000;
-      10, 100000;
-      1, 1000000;
+      100, 10_000;
+      10, 100_000;
+      1, 1_000_000;
     ]
 
 let () =
