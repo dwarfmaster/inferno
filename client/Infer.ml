@@ -9,7 +9,7 @@ module S = struct
 
   type 'a structure =
     | TyArrow of 'a * 'a
-    | TyProduct of 'a * 'a
+    | TyProduct of 'a list
 
   let map f t =
     match t with
@@ -17,18 +17,18 @@ module S = struct
         let t1 = f t1 in
         let t2 = f t2 in
         TyArrow (t1, t2)
-    | TyProduct (t1, t2) ->
-        let t1 = f t1 in
-        let t2 = f t2 in
-        TyProduct (t1, t2)
+    | TyProduct ts ->
+        let ts = List.map f ts in
+        TyProduct ts
 
   let fold f t accu =
     match t with
-    | TyArrow (t1, t2)
-    | TyProduct (t1, t2) ->
+    | TyArrow (t1, t2) ->
         let accu = f t1 accu in
         let accu = f t2 accu in
         accu
+    | TyProduct ts ->
+        List.fold_right f ts accu
 
   let iter f t =
     let _ = map f t in
@@ -38,10 +38,12 @@ module S = struct
 
   let iter2 f t u =
     match t, u with
-    | TyArrow (t1, t2), TyArrow (u1, u2)
-    | TyProduct (t1, t2), TyProduct (u1, u2) ->
+    | TyArrow (t1, t2), TyArrow (u1, u2) ->
         f t1 u1;
         f t2 u2
+    | TyProduct ts1, TyProduct ts2 ->
+      if List.length ts1 <> List.length ts2 then raise Iter2;
+      List.iter2 f ts1 ts2
     | _, _ ->
         raise Iter2
 
@@ -70,8 +72,8 @@ module O = struct
     match t with
     | S.TyArrow (t1, t2) ->
         F.TyArrow (t1, t2)
-    | S.TyProduct (t1, t2) ->
-        F.TyProduct [t1; t2]
+    | S.TyProduct ts ->
+        F.TyProduct ts
 
   let mu x t =
     F.TyMu (x, t)
@@ -95,8 +97,8 @@ open Solver
 let arrow x y =
   S.TyArrow (x, y)
 
-let product x y =
-  S.TyProduct (x, y)
+let product xs =
+  S.TyProduct xs
 
 (* Should we use smart constructors to eliminate redundant coercions when possible? *)
 let smart =
@@ -243,7 +245,7 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       exist_ (fun v1 ->
         exist_ (fun v2 ->
           (* [w] must be the product type [v1 * v2]. *)
-          w --- product v1 v2 ^^
+          w --- product [v1; v2] ^^
           (* [t1] must have type [t1], and [t2] must have type [t2]. *)
           hastype t1 v1 ^&
           hastype t2 v2
