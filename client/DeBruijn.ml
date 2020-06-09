@@ -79,6 +79,21 @@ module Nominal2deBruijn (N : Map.OrderedType) = struct
     let current = current + 1 in
     { map; current }
 
+  (* [concat env1 env2] extends [env1] with all the bindings of [env2];
+     bindings of [env2] shadow any binding of the same variable in [env1]. *)
+
+  let concat env1 env2 =
+    (* We need to shift the de Bruijn levels of [env2] (and its
+       [current] value) by as many bindings as there are in [env1]. *)
+    let shift _x in1 in2 =
+      match in2 with
+      | None -> in1
+      | Some lvl -> Some (env1.current + lvl)
+    in
+    {
+      current = env1.current + env2.current;
+      map = M.merge shift env1.map env2.map;
+    }
 end
 
 (* -------------------------------------------------------------------------- *)

@@ -50,6 +50,10 @@ module Nominal2deBruijn (N : Map.OrderedType) : sig
 
   val bump: env -> env
 
+  (* [concat env1 env2] extends [env1] with all the bindings of [env2];
+     bindings of [env2] shadow any binding of the same variable in [env1]. *)
+
+  val concat: env -> env -> env
 end
 
 (* -------------------------------------------------------------------------- *)
