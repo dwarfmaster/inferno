@@ -17,7 +17,6 @@ open SolverSig
    which solves a constraint and annotates it, so as to publish information
    that can be exploited in the reconstruction phase. *)
 
-(* BEGIN LOW *)
 module Make
   (X : TEVAR)
   (S : STRUCTURE)
@@ -127,6 +126,4 @@ module Make
      with a type decoder. *)
   val decode_scheme: decoder -> ischeme -> scheme
 
-(* END *)
 end
-(* END LOW *)

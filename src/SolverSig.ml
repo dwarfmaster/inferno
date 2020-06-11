@@ -18,7 +18,6 @@
 (* This signature is isomorphic to [Map.OrderedType] in OCaml's standard
    library. *)
 
-(* BEGIN TEVAR *)
 module type TEVAR = sig
 
   (* The type of term variables. *)
@@ -27,16 +26,13 @@ module type TEVAR = sig
   (* A total ordering. *)
   val compare: tevar -> tevar -> int
 
-(* END *)
 end  
-(* END TEVAR *)
 
 (* -------------------------------------------------------------------------- *)
 
 (* The structure of types *after decoding* is described to the solver as
    follows. *)
 
-(* BEGIN OUTPUT *)
 module type OUTPUT = sig
 
   (* The solver represents type variables via unique integer identifiers. *)
@@ -72,6 +68,4 @@ module type OUTPUT = sig
   (* A decoded type scheme consists of a list of quantifiers and a body. *)
   type scheme = tyvar list * ty
 
-(* END *)
 end
-(* END OUTPUT *)

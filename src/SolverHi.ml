@@ -49,44 +49,32 @@ type variable =
 (* The continuation has access to an environment of type [env]. For the moment,
    the environment is just a type decoder. *)
 
-(* BEGIN ENV *)
 type env =
   decoder
-(* END ENV *)
 
-(* BEGIN CO *)
 type 'a co =
   rawco * (env -> 'a)
-(* END CO *)
 
 (* -------------------------------------------------------------------------- *)
 
 (* The type ['a co] forms an applicative functor. *)
 
-(* BEGIN PURE *)
 let pure a =
   CTrue,
   fun _env -> a
-(* END PURE *)
 
-(* BEGIN PAIR *)
 let (^&) (rc1, k1) (rc2, k2) =
   CConj (rc1, rc2),
   fun env -> (k1 env, k2 env)
-(* END PAIR *)
 
-(* BEGIN MAP *)
 let map f (rc, k) =
   rc,
   fun env -> f (k env)
-(* END MAP *)
 
 (* The function [<$$>] is just [map] with reversed argument order. *)
 
-(* BEGIN RMAP *)
 let (<$$>) a f =
   map f a
-(* END RMAP *)
 
 (* The function [^^], a variation of [^&], also builds a conjunction constraint,
    but drops the first component of the resulting pair, and keeps only the second
@@ -109,7 +97,6 @@ let (^^) (rc1, k1) (rc2, k2) =
 
 (* Existential quantification. *)
 
-(* BEGIN EXIST *)
 let exist f =
   (* Create a fresh unifier variable [v]. *)
   let v = fresh None in
@@ -122,7 +109,6 @@ let exist f =
   fun env ->
     let decode = env in
     (decode v, k env)
-(* END EXIST *)
 
 (* [construct] is identical to [exist], except [None] is replaced with
    [Some t]. We do not factor out the common code, because we wish to
@@ -160,11 +146,9 @@ let lift f v1 t2 =
 
 (* Equations. *)
 
-(* BEGIN EQ *)
 let (--) v1 v2 =
   CEq (v1, v2),
   fun _env -> ()
-(* END EQ *)
 
 let (---) v t =
   lift (--) v t
@@ -183,7 +167,6 @@ let _other_lift f v1 t2 =
 
 (* Instantiation constraints. *)
 
-(* BEGIN INSTANCE *)
 let instance x v =
   (* In the constraint construction phase, create a write-once reference,
      and stick it into the constraint, for the solver to fill. *)
@@ -195,7 +178,6 @@ let instance x v =
        obtain the list of witnesses. Decode them, and return them to
        the user. *)
     List.map decode (WriteOnceRef.get witnesses)
-(* END INSTANCE *)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -292,16 +274,11 @@ end
 (* Solving, or running, a constraint. *)
 
 exception Unbound = Lo.Unbound
-(* BEGIN EXC *)
 exception Unify of O.ty * O.ty
 exception Cycle of O.ty
-(* END EXC *)
 
-(* BEGIN SOLVE *)
 let solve rectypes (rc, k) =
-(* END SOLVE *)
   assert (ok rc);
-(* BEGIN SOLVE *)
   begin try
     (* Solve the constraint. *)
     Lo.solve rectypes rc
@@ -324,6 +301,5 @@ let solve rectypes (rc, k) =
   (* Invoke the client continuation. *)
   let env = decode in
   k env
-(* END SOLVE *)
 
 end

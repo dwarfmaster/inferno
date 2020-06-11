@@ -179,7 +179,6 @@ let coerce (vs1 : O.tyvar list) (vs2 : O.tyvar list) : coercion =
    No type environment is required, as everything is built into the constraint via
    suitable combinators, such as [def]. *)
 
-(* BEGIN HASTYPE *)
 let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
 = match t with
 
@@ -243,9 +242,7 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       F.Let (x, coerce a b (F.Var x),
       ELSE *)
       flet (x, coerce a b (F.Var x),
-(* END *)
       u'))
-(* END HASTYPE *)
 
     (* Pair. *)
   | ML.Pair (t1, t2) ->
