@@ -38,3 +38,10 @@ let attempt log msg f x =
     Printexc.print_backtrace stdout;
     flush stdout;
     exit 1
+
+let with_log test input =
+  let log = create_log () in
+  let passes = test ~log input in
+  if Config.verbose then
+    print_log log;
+  passes

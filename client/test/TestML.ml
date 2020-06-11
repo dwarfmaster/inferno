@@ -39,11 +39,11 @@ let app_pair = (* ill-typed *)
   ML.App (ML.Pair (id, id), id)
 
 let () =
-  assert (Test.CheckML.test idid);
-  assert (Test.CheckML.test genid);
-  assert (Test.CheckML.test genidid);
-  assert (Test.CheckML.test genkidid);
-  assert (Test.CheckML.test genkidid2);
+  assert Test.(Log.with_log CheckML.test idid);
+  assert Test.(Log.with_log CheckML.test genid);
+  assert Test.(Log.with_log CheckML.test genidid);
+  assert Test.(Log.with_log CheckML.test genkidid);
+  assert Test.(Log.with_log CheckML.test genkidid2);
   (* we include some printing below because Dune
      appears to only show tests that show some output. *)
   print_endline "TestML: all tests passed."

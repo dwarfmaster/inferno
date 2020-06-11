@@ -97,7 +97,7 @@ let () =
         Printf.printf "Test number %d...\n%!" i;
       let t = random_ml_term 0 n in
       assert (size t = n);
-      let success = Test.CheckML.test t in
+      let success = Test.(Log.with_log CheckML.test t) in
       if success then incr c;
       incr d
     done
