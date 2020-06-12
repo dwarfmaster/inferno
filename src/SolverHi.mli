@@ -16,7 +16,6 @@ open SolverSig
 
 (* The solver is parameterized over the nature of term variables, the type
    structure, and the client's representation of types. *)
-(* BEGIN HI *)
 module Make
   (X : TEVAR)
   (S : STRUCTURE)
@@ -58,7 +57,6 @@ module Make
   val map: ('a -> 'b) -> 'a co -> 'b co
 
   (* ---------------------------------------------------------------------- *)
-  (* END HI *)
 
   (* Variants of the above. *)
 
@@ -70,7 +68,6 @@ module Make
      only the second component. [f ^^ g] is equivalent to [f ^& g <$$> snd]. *)
   val (^^): 'a co -> 'b co -> 'b co
 
-  (* BEGIN HI *)
   (* ---------------------------------------------------------------------- *)
 
   (* Equations. *)
@@ -93,7 +90,6 @@ module Make
      the witness for [v]. *)
   val exist:                            (variable -> 'a co) -> (ty * 'a) co
 
-  (* END HI *)
   (* [construct t c] is analogous to [exist c], but additionally constrains
      the type variable [v] to be equal to the type [t]. So, it is really a
      way of constructing a variable that stands for a shallow term. *)
@@ -117,7 +113,6 @@ module Make
      type. It is defined in terms of [construct_] and [f]. *)
   val lift: ('a -> variable -> 'b co) -> 'a -> variable structure -> 'b co
 
-  (* BEGIN HI *)
   (* ---------------------------------------------------------------------- *)
 
   (* Application of constraint abstractions, a.k.a. instantiation. *)
@@ -150,7 +145,6 @@ module Make
   val let1: tevar -> (variable -> 'a co) -> 'b co ->
             (scheme * tyvar list * 'a * 'b) co
 
-  (* END HI *)
   (* [let0 c] has the same meaning as [c], but, like [let1], produces a list [vs]
      of the type variables that may appear in the result of [c]. The argument of
      [run] should always be an application of [let0] -- see below. *)
@@ -164,7 +158,6 @@ module Make
   val letn: tevar list -> (variable list -> 'a co) -> 'b co ->
             (scheme list * tyvar list * 'a * 'b) co
 
-  (* BEGIN HI *)
   (* ---------------------------------------------------------------------- *)
 
   (* Evaluation. *)
@@ -189,6 +182,4 @@ module Make
   exception Cycle of ty
   val solve: bool -> 'a co -> 'a
 
-(* END *)
 end
-(* END HI *)

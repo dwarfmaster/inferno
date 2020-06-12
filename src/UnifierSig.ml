@@ -17,7 +17,6 @@
 
 (* The structure of types is described to the unifier as follows. *)
 
-(* BEGIN STRUCTURE *)
 module type STRUCTURE = sig
 
   (* The type ['a structure] should be understood as a type of shallow (that
@@ -36,9 +35,7 @@ module type STRUCTURE = sig
   exception Iter2
   val iter2: ('a -> 'b -> unit) -> 'a structure -> 'b structure -> unit
 
-(* END *)
 end
-(* END STRUCTURE *)
 
 (* -------------------------------------------------------------------------- *)
 (* -------------------------------------------------------------------------- *)
