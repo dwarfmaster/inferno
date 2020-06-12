@@ -15,13 +15,9 @@ let rec print_type_aux level ty =
   match ty with
   | TyVar x ->
       print_tyvar x
-  | TyProduct (ty1, ty2) ->
-      if level >= 1 then
-        print_type_aux 0 ty1 ^^
-        string " * " ^^
-        print_type_aux 1 ty2
-      else
-        parens (print_type ty)
+  | TyProduct tys ->
+      surround_separate_map 2 0 (lbrace ^^ rbrace)
+        lbrace star rbrace print_type tys
   | TyArrow (ty1, ty2) ->
       if level >= 2 then
         print_type_aux 1 ty1 ^^
@@ -52,6 +48,17 @@ and print_type ty =
 (* -------------------------------------------------------------------------- *)
 
 (* Terms. *)
+
+let print_tuple print_elem elems =
+  let contents =
+    match elems with
+    | [elem] ->
+        (* For arity-1 tuples we print (foo,)
+           instead of (foo) which would be ambiguous. *)
+        print_elem elem ^^ comma
+    | _ ->
+        separate_map (comma ^^ space) print_elem elems in
+  surround 2 0 lparen contents rparen
 
 let rec print_term_aux level t =
   assert (level >= 0);
@@ -101,12 +108,8 @@ let rec print_term_aux level t =
         print_term_aux 2 t1
       else
         parens (print_term t)
- | Pair (t1, t2) ->
-      parens (
-        print_term t1 ^^
-        comma ^^ space ^^
-        print_term t2
-      )
+  | Tuple ts ->
+      print_tuple print_term ts
   | Proj (i, t2) ->
       (* like [App] *)
       if level >= 1 then

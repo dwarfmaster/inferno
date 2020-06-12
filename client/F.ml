@@ -17,7 +17,7 @@
 type ('a, 'b) typ =
   | TyVar of 'a
   | TyArrow of ('a, 'b) typ * ('a, 'b) typ
-  | TyProduct of ('a, 'b) typ * ('a, 'b) typ
+  | TyProduct of ('a, 'b) typ list
   | TyForall of 'b * ('a, 'b) typ
   | TyMu of 'b * ('a, 'b) typ
 
@@ -43,7 +43,7 @@ type ('a, 'b) term =
   | Let of tevar * ('a, 'b) term * ('a, 'b) term
   | TyAbs of 'b * ('a, 'b) term
   | TyApp of ('a, 'b) term * ('a, 'b) typ
-  | Pair of ('a, 'b) term * ('a, 'b) term
+  | Tuple of ('a, 'b) term list
   | Proj of int * ('a, 'b) term
 
 type nominal_term = (tyvar, tyvar) term
@@ -99,10 +99,9 @@ module TypeInType : DeBruijn.TRAVERSE
         let ty1' = traverse lookup extend env ty1
         and ty2' = traverse lookup extend env ty2 in
         TyArrow (ty1', ty2')
-    | TyProduct (ty1, ty2) ->
-        let ty1' = traverse lookup extend env ty1
-        and ty2' = traverse lookup extend env ty2 in
-        TyProduct (ty1', ty2')
+    | TyProduct tys ->
+        let tys' = List.map (traverse lookup extend env) tys in
+        TyProduct tys'
     | TyForall (x, ty1) ->
         let env, x = extend env x in
         let ty1' = traverse lookup extend env ty1 in
@@ -153,10 +152,9 @@ module TypeInTerm : DeBruijn.TRAVERSE
         let t' = traverse lookup extend env t
         and ty' = TypeInType.traverse lookup extend env ty in
         TyApp (t', ty')
-    | Pair (t1, t2) ->
-        let t1' = traverse lookup extend env t1
-        and t2' = traverse lookup extend env t2 in
-        Pair (t1', t2')      
+    | Tuple ts ->
+        let ts' = List.map (traverse lookup extend env) ts in
+        Tuple ts'
     | Proj (i, t) ->
         let t' = traverse lookup extend env t in
         Proj (i, t')

@@ -71,7 +71,7 @@ module O = struct
     | S.TyArrow (t1, t2) ->
         F.TyArrow (t1, t2)
     | S.TyProduct (t1, t2) ->
-        F.TyProduct (t1, t2)
+        F.TyProduct [t1; t2]
 
   let mu x t =
     F.TyMu (x, t)
@@ -257,7 +257,7 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
         )
       ) <$$> fun (t1, t2) ->
       (* The System F term. *)
-      F.Pair (t1, t2)
+      F.Tuple [t1; t2]
 
     (* Projection. *)
   | ML.Proj (i, t) ->
