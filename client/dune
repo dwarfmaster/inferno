@@ -1,5 +1,5 @@
-(test
-  (name Main)
-  (libraries unix pprint inferno)
+(library
+  (name client)
+  (libraries pprint inferno)
   (flags "-w" "@1..66-4-44")
 )
