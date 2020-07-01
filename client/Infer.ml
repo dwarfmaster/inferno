@@ -57,6 +57,9 @@ module O = struct
   type tyvar =
     int
 
+  let solver_tyvar n =
+    n
+
   type 'a structure =
     'a S.structure
 

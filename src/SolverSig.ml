@@ -34,9 +34,12 @@ end
    follows. *)
 
 module type OUTPUT = sig
+  (* nominal type variables *)
+  type tyvar
 
-  (* The solver represents type variables via unique integer identifiers. *)
-  type tyvar = int
+  (* The solver represents inference variables via unique integer identifiers,
+     and needs to be able to inject them into decoded type variables. *)
+  val solver_tyvar : int -> tyvar
 
   (* The solver works with first-order types whose structure is defined by
      the type ['a structure], as in the signature [Unifier.STRUCTURE]. *)

@@ -170,7 +170,7 @@ let decode_variable (x : variable) : O.tyvar =
      time of writing this comment, the API does not expose the decoder,
      so the client should have no way of violating this assertion. *)
   assert (U.rank x <> G.no_rank);
-  U.id x
+  O.solver_tyvar (U.id x)
 
 let decode_variable_as_type (x : variable) : O.ty =
   O.variable (decode_variable x)
