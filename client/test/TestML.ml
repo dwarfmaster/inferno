@@ -36,7 +36,7 @@ let genkidid2 =
   ML.Let ("x", ML.App (ML.App (k, id), id), x)
 
 let app_pair = (* ill-typed *)
-  ML.App (ML.Pair (id, id), id)
+  ML.App (ML.Tuple [id; id], id)
 
 let () =
   assert Test.(Log.with_log CheckML.test idid);

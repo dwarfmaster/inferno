@@ -24,7 +24,7 @@ let rec random_ml_term k n =
     ML.Var (int2var (Random.int k))
   end
   else
-    let c = Random.int 5 (* Abs, App, Pair, Proj, Let *) in
+    let c = Random.int 5 (* Abs, App, Pair, Let, LetProd *) in
     if k = 0 || c = 0 then
       (* The next available variable is [k]. *)
       let x, k = int2var k, k + 1 in
@@ -34,12 +34,14 @@ let rec random_ml_term k n =
       ML.App (random_ml_term k n1, random_ml_term k n2)
     else if c = 2 then
       let n1, n2 = split (n - 1) in
-      ML.Pair (random_ml_term k n1, random_ml_term k n2)
+      ML.Tuple [random_ml_term k n1; random_ml_term k n2]
     else if c = 3 then
-      ML.Proj (1 + Random.int 2, random_ml_term k (n - 1))
-    else if c = 4 then
       let n1, n2 = split (n - 1) in
       ML.Let (int2var k, random_ml_term k n1, random_ml_term (k + 1) n2)
+    else if c = 4 then
+      let n1, n2 = split (n - 1) in
+      let x1, x2, k' = int2var k, int2var (k + 1), k + 2 in
+      ML.LetProd ([x1; x2], random_ml_term k n1, random_ml_term k' n2)
     else
       assert false
 
@@ -47,12 +49,13 @@ let rec size accu = function
   | ML.Var _ ->
       accu
   | ML.Abs (_, t)
-  | ML.Proj (_, t)
     -> size (accu + 1) t
   | ML.App (t1, t2)
   | ML.Let (_, t1, t2)
-  | ML.Pair (t1, t2)
+  | ML.LetProd (_, t1, t2)
     -> size (size (accu + 1) t1) t2
+  | ML.Tuple ts
+    -> List.fold_left size (accu + 1) ts
 
 let size =
   size 0

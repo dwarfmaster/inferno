@@ -85,8 +85,8 @@ exception NotAProduct of debruijn_type
 
 let rec as_product ty =
   match ty with
-  | TyProduct (ty1, ty2) ->
-      ty1, ty2
+  | TyProduct tys ->
+      tys
   | TyMu _ ->
       as_product (unfold ty)
   | _ ->
@@ -130,8 +130,9 @@ let rec equal budget ty1 ty2 =
       x1 = x2
   | TyArrow (ty1a, ty1b), TyArrow (ty2a, ty2b) ->
       equal budget ty1a ty2a && equal budget ty1b ty2b
-  | TyProduct (ty1a, ty1b), TyProduct (ty2a, ty2b) ->
-      equal budget ty1a ty2a && equal budget ty1b ty2b
+  | TyProduct tys1, TyProduct tys2 ->
+      List.length tys1 = List.length tys2
+      && List.for_all2 (equal budget) tys1 tys2
   | TyForall ((), ty1), TyForall ((), ty2) ->
       equal budget ty1 ty2
   | _, _ ->
@@ -147,6 +148,13 @@ let (--) ty1 ty2 =
 (* -------------------------------------------------------------------------- *)
 
 (* The type-checker. *)
+
+let nth_type tys i =
+  if i < 0 || i >= List.length tys then
+    assert false
+  else
+    List.nth tys i
+
 
 let rec typeof env (t : debruijn_term) : debruijn_type =
   match t with
@@ -166,12 +174,17 @@ let rec typeof env (t : debruijn_term) : debruijn_type =
       TyForall ((), typeof (extend_with_tyvar env) t)
   | TyApp (t, ty2) ->
       subst ty2 0 (as_forall (typeof env t))
-  | Pair (t1, t2) ->
-      TyProduct (typeof env t1, typeof env t2)
+  | Tuple ts ->
+      let tys = List.map (typeof env) ts in
+      TyProduct tys
   | Proj (i, t) ->
-      assert (i = 1 || i = 2);
-      let ty1, ty2 = as_product (typeof env t) in
-      if i = 1 then ty1 else ty2
+      let ty = typeof env t in
+      let tys = as_product ty in
+      nth_type tys (i-1)
+  | LetProd (xs, t, u) ->
+      let tys = as_product (typeof env t) in
+      let env = List.fold_left2 extend_with_tevar env xs tys in
+      typeof env u
 
 let typeof =
   typeof empty

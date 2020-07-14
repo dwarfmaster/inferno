@@ -9,7 +9,7 @@ module S = struct
 
   type 'a structure =
     | TyArrow of 'a * 'a
-    | TyProduct of 'a * 'a
+    | TyProduct of 'a list
 
   let map f t =
     match t with
@@ -17,18 +17,18 @@ module S = struct
         let t1 = f t1 in
         let t2 = f t2 in
         TyArrow (t1, t2)
-    | TyProduct (t1, t2) ->
-        let t1 = f t1 in
-        let t2 = f t2 in
-        TyProduct (t1, t2)
+    | TyProduct ts ->
+        let ts = List.map f ts in
+        TyProduct ts
 
   let fold f t accu =
     match t with
-    | TyArrow (t1, t2)
-    | TyProduct (t1, t2) ->
+    | TyArrow (t1, t2) ->
         let accu = f t1 accu in
         let accu = f t2 accu in
         accu
+    | TyProduct ts ->
+        List.fold_right f ts accu
 
   let iter f t =
     let _ = map f t in
@@ -38,10 +38,12 @@ module S = struct
 
   let iter2 f t u =
     match t, u with
-    | TyArrow (t1, t2), TyArrow (u1, u2)
-    | TyProduct (t1, t2), TyProduct (u1, u2) ->
+    | TyArrow (t1, t2), TyArrow (u1, u2) ->
         f t1 u1;
         f t2 u2
+    | TyProduct ts1, TyProduct ts2 ->
+      if List.length ts1 <> List.length ts2 then raise Iter2;
+      List.iter2 f ts1 ts2
     | _, _ ->
         raise Iter2
 
@@ -70,8 +72,8 @@ module O = struct
     match t with
     | S.TyArrow (t1, t2) ->
         F.TyArrow (t1, t2)
-    | S.TyProduct (t1, t2) ->
-        F.TyProduct (t1, t2)
+    | S.TyProduct ts ->
+        F.TyProduct ts
 
   let mu x t =
     F.TyMu (x, t)
@@ -95,15 +97,8 @@ open Solver
 let arrow x y =
   S.TyArrow (x, y)
 
-let product x y =
-  S.TyProduct (x, y)
-
-let product_i i x y =
-  assert (i = 1 || i = 2);
-  if i = 1 then
-    product x y
-  else
-    product y x
+let product xs =
+  S.TyProduct xs
 
 (* Should we use smart constructors to eliminate redundant coercions when possible? *)
 let smart =
@@ -244,28 +239,46 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       flet (x, coerce a b (F.Var x),
       u'))
 
-    (* Pair. *)
-  | ML.Pair (t1, t2) ->
-
-      exist_ (fun v1 ->
-        exist_ (fun v2 ->
-          (* [w] must be the product type [v1 * v2]. *)
-          w --- product v1 v2 ^^
-          (* [t1] must have type [t1], and [t2] must have type [t2]. *)
-          hastype t1 v1 ^&
-          hastype t2 v2
-        )
-      ) <$$> fun (t1, t2) ->
+  | ML.Tuple ts ->
+      begin
+        let rec traverse
+            (ts : ML.term list)
+            (k : variable list -> 'a co)
+        : (F.nominal_term list * 'a) co =
+          match ts with
+          | [] ->
+            map (fun r -> ([], r)) @@
+            k []
+          | t::ts ->
+            exist_ @@ fun v ->
+            map (fun (t', (ts', r)) -> (t'::ts', r)) @@
+            hastype t v ^&
+            traverse ts @@ fun vs ->
+            k (v :: vs)
+        in
+        traverse ts @@ fun vs ->
+        w --- product vs
+      end <$$> fun (ts', ()) ->
       (* The System F term. *)
-      F.Pair (t1, t2)
+      F.Tuple ts'
 
-    (* Projection. *)
-  | ML.Proj (i, t) ->
-
-      exist_ (fun other ->
-        lift hastype t (product_i i w other)
-      ) <$$> fun t ->
-      F.Proj (i, t)
+  | ML.LetProd (xs, t, u) ->
+    begin
+      let rec traverse : 'a . string list -> (variable list -> 'a co) -> 'a co
+      = fun xs k -> match xs with
+      | [] ->
+        k []
+      | x::xs ->
+        exist_ @@ fun v ->
+        def x v @@
+        traverse xs @@ fun vs ->
+        k (v :: vs)
+      in
+      traverse xs @@ fun vs ->
+      lift hastype t (product vs) ^&
+      hastype u w
+    end <$$> fun (t', u') ->
+    F.LetProd(xs, t', u')
 
 (* The top-level wrapper uses [let0]. It does not require an expected
    type; it creates its own using [exist]. And it runs the solver. *)

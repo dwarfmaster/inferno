@@ -17,7 +17,7 @@
 type ('a, 'b) typ =
   | TyVar of 'a
   | TyArrow of ('a, 'b) typ * ('a, 'b) typ
-  | TyProduct of ('a, 'b) typ * ('a, 'b) typ
+  | TyProduct of ('a, 'b) typ list
   | TyForall of 'b * ('a, 'b) typ
   | TyMu of 'b * ('a, 'b) typ
 
@@ -48,8 +48,9 @@ type ('a, 'b) term =
   | Let of tevar * ('a, 'b) term * ('a, 'b) term
   | TyAbs of 'b * ('a, 'b) term
   | TyApp of ('a, 'b) term * ('a, 'b) typ
-  | Pair of ('a, 'b) term * ('a, 'b) term
+  | Tuple of ('a, 'b) term list
   | Proj of int * ('a, 'b) term
+  | LetProd of tevar list * ('a, 'b) term * ('a, 'b) term
 
 type nominal_term =
     (tyvar, tyvar) term
