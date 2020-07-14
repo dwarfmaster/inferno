@@ -42,8 +42,8 @@ module S = struct
         f t1 u1;
         f t2 u2
     | TyProduct ts1, TyProduct ts2 ->
-      if List.length ts1 <> List.length ts2 then raise Iter2;
-      List.iter2 f ts1 ts2
+        if List.length ts1 <> List.length ts2 then raise Iter2;
+        List.iter2 f ts1 ts2
     | _, _ ->
         raise Iter2
 
