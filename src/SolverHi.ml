@@ -138,6 +138,45 @@ let lift f v1 t2 =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Deep types. *)
+
+type deep_ty =
+  | DeepVar of variable
+  | DeepStructure of deep_ty S.structure
+
+(* Conversion of deep types to shallow types. *)
+
+(* Our API is so constrained that this seems extremely difficult to implement
+   from the outside. So, we provide it, for the user's convenience. In fact,
+   even here, inside the abstraction, implementing this conversion is slightly
+   tricky. *)
+
+let build dty f =
+  (* Accumulate a list of the fresh variables that we create. *)
+  let vs = ref [] in
+  (* [convert] converts a deep type to a variable. *)
+  let rec convert dty =
+    match dty with
+    | DeepVar v ->
+        v
+    | DeepStructure s ->
+        (* First recursively convert our children, then allocate a fresh
+           variable [v] to stand for the root. Record its existence in the
+           list [vs]. *)
+        let v = fresh (Some (S.map convert s)) in
+        vs := v :: !vs;
+        v
+  in
+  (* Convert the deep type [dty] and pass the variable that stands for its
+     root the user function [f]. *)
+  let rc, k = f (convert dty) in
+  (* Then, create a bunch of existential quantifiers, in an arbitrary order. *)
+  List.fold_left (fun rc v -> CExist (v, rc)) rc !vs,
+  (* Keep an unchanged continuation. *)
+  k
+
+(* -------------------------------------------------------------------------- *)
+
 (* Equations. *)
 
 let (--) v1 v2 =

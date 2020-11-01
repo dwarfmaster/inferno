@@ -97,6 +97,17 @@ module Make
 
   (* ---------------------------------------------------------------------- *)
 
+  (* Deep types. *)
+  type deep_ty =
+    | DeepVar of variable
+    | DeepStructure of deep_ty S.structure
+
+  (* [build dty c] constructs a variable [v] that stands for the deep type
+     [dty] and passes [v] to the function [c]. *)
+  val build: deep_ty -> (variable -> 'a co) -> 'a co
+
+  (* ---------------------------------------------------------------------- *)
+
   (* A utility. *)
 
   (* If [f] is a binary predicate whose second argument is a type variable,
