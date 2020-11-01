@@ -1,3 +1,13 @@
+* Offer a combinator `decode` of type `variable -> ty co` which requests
+  the decoding of a type variable. If we have this, then we can remove
+  or simplify the combinators that perform decoding. E.g., `exist` can
+  be removed, and `exist_` can be renamed to `exist`. Same thing for
+  `construct` and `construct_`. (I don't see how to simplify `instance`.)
+
+* Document the requirement that the function passed to `map` must be pure.
+  Use this hypothesis to remove the useless evaluation of `k1 env` in the
+  definition of `^^`.
+
 * Think about the treatment of unreachable type variables. Could it
   be simplified? Do we really need a let form that binds several names at once?
 
