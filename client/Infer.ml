@@ -236,9 +236,6 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
          coercion to [x]. We use smart constructors so that, if the lists [a] and
          [b] happen to be equal, no extra code is produced. *)
       F.Let (x, F.ftyabs a t',
-(* IFPAPER
-      F.Let (x, coerce a b (F.Var x),
-      ELSE *)
       flet (x, coerce a b (F.Var x),
       u'))
 
