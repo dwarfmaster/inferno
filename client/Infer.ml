@@ -187,40 +187,44 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
   | ML.Var x ->
 
       (* [w] must be an instance of the type scheme associated with [x]. *)
-      instance x w <$$> fun tys ->
+      instance x w
       (* The translation makes the type application explicit. *)
+      <$$> fun tys ->
       F.ftyapp (F.Var x) tys
 
     (* Abstraction. *)
   | ML.Abs (x, u) ->
 
-      (* We do not know a priori what the domain and codomain of this function
-         are, so we must infer them. We introduce two type variables to stand
-         for these unknowns. *)
-      exist (fun v1 ->
-          (* Here, we use [exist_], because we do not need [ty2]. *)
-        exist_ (fun v2 ->
-          (* [w] must be the function type [v1 -> v2]. We use [^^] instead of
-             [^&] so as to avoid building a useless pair. *)
-          w --- arrow v1 v2 ^^
-          (* Under the assumption that [x] has type [domain], the term [u]
-             must have type [codomain]. *)
-          def x v1 (hastype u v2)
-        )
-      ) <$$> fun (ty1, u') ->
+      begin
+        (* We do not know a priori what the domain and codomain of this function
+           are, so we must infer them. We introduce two type variables to stand
+           for these unknowns. *)
+        exist @@ fun v1 ->
+        (* Here, we use [exist_], because we do not need [ty2]. *)
+        exist_ @@ fun v2 ->
+        (* [w] must be the function type [v1 -> v2]. We use [^^] instead of
+           [^&] so as to avoid building a useless pair. *)
+        w --- arrow v1 v2 ^^
+        (* Under the assumption that [x] has type [domain], the term [u]
+           must have type [codomain]. *)
+        def x v1 (hastype u v2)
+      end
       (* Once these constraints are solved, we obtain the translated function
          body [u']. There remains to construct an explicitly-typed abstraction
          in the target calculus. *)
+      <$$> fun (ty1, u') ->
       F.Abs (x, ty1, u')
 
     (* Application. *)
   | ML.App (t1, t2) ->
 
-      (* Introduce a type variable to stand for the unknown argument type. *)
-      exist (fun v ->
+      begin
+        (* Introduce a type variable to stand for the unknown argument type. *)
+        exist_ @@ fun v ->
         lift hastype t1 (arrow v w) ^&
         hastype t2 v
-      ) <$$> fun (_ty, (t1', t2')) ->
+      end
+      <$$> fun (t1', t2') ->
       F.App (t1', t2')
 
     (* Generalization. *)
@@ -229,14 +233,14 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       (* Construct a ``let'' constraint. *)
       let1 x (hastype t)
         (hastype u w)
+      (* [a] are the type variables that we must bind (via Lambda abstractions)
+         while type-checking [t]. [(b, _)] is the type scheme that [x] must
+         receive while type-checking [u]. Its quantifiers [b] are guaranteed to
+         form a subset of [a]. Hence, in general, we must re-bind [x] to an
+         application of a suitable coercion to [x]. We use smart constructors so
+         that, if the lists [a] and [b] happen to be equal, no extra code is
+         produced. *)
       <$$> fun ((b, _), a, t', u') ->
-      (* [a] are the type variables that we must introduce (via Lambda
-         abstractions) while type-checking [t]. [(b, _)] is the type scheme
-         that [x] must receive while type-checking [u]. Its quantifiers [b]
-         are guaranteed to form a subset of [a]. Hence, in general, we must
-         re-bind [x] to an application of a suitable coercion to [x]. We use
-         smart constructors so that, if the lists [a] and [b] happen to be
-         equal, no extra code is produced. *)
       F.Let (x, F.ftyabs a t',
       flet (x, coerce a b (F.Var x),
       u'))
