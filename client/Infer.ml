@@ -1,5 +1,5 @@
-(* This sample client performs type inference for a fragment of ML and translates
-   it down to a fragment of System F. *)
+(* This sample client performs type inference for a fragment of ML and
+   translates it down to a fragment of System F. *)
 
 (* -------------------------------------------------------------------------- *)
 
@@ -51,8 +51,8 @@ end
 
 (* -------------------------------------------------------------------------- *)
 
-(* The unifier type structure is decoded into the target calculus type structure
-   as follows. *)
+(* The unifier type structure is decoded into the target calculus type
+   structure as follows. *)
 
 module O = struct
 
@@ -130,13 +130,14 @@ let bottom : F.nominal_type =
   let a : F.tyvar = 0 (* arbitrary *) in
   F.TyForall (a, F.TyVar a)
 
-(* [ftyabs1 v t] builds a (capital-Lambda) abstraction of the type variable [v]
-   in the term [t]. It is a smart constructor: if it recognizes an eta-redex,
-   it contracts it on the fly. We are in a special case where, if [v] and [w]
-   are the same variable, then this variable does not occur free in [t], so we
-   don't need to perform this costly check at runtime. This eta-contraction is
-   not essential anyway; it's just a way of avoiding coercion clutter in the
-   common case where the coercion actually has no effect. *)
+(* [ftyabs1 v t] builds a (capital-Lambda) abstraction of the type variable
+   [v] in the term [t]. It is a smart constructor: if it recognizes an
+   eta-redex, it contracts it on the fly. We are in a special case where, if
+   [v] and [w] are the same variable, then this variable does not occur free
+   in [t], so we don't need to perform this costly check at runtime. This
+   eta-contraction is not essential anyway; it's just a way of avoiding
+   coercion clutter in the common case where the coercion actually has no
+   effect. *)
 
 let ftyabs1 v t =
   match t with
@@ -169,11 +170,11 @@ let coerce (vs1 : O.tyvar list) (vs2 : O.tyvar list) : coercion =
 
 (* -------------------------------------------------------------------------- *)
 
-(* The client uses the combinators provided by the solver so as to transparently
-   1- analyse the source term and produce constraints; and 2- decode the solution
-   of the constraints and produce a term in the target calculus. These two steps
-   take place in different phases, but the code is written as if there was just
-   one phase. *)
+(* The client uses the combinators provided by the solver so as to
+   transparently 1- analyse the source term and produce constraints; and 2-
+   decode the solution of the constraints and produce a term in the target
+   calculus. These two steps take place in different phases, but the code is
+   written as if there was just one phase. *)
 
 (* The function [hastype] takes a source term [t] and an expected type [w]. No
    type environment is required, as everything is built into the constraint
@@ -197,15 +198,15 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
          are, so we must infer them. We introduce two type variables to stand
          for these unknowns. *)
       exist (fun v1 ->
-        (* Here, we could use [exist_], because we do not need [ty2]. I refrain
-           from using it, just to simplify the paper. *)
+          (* Here, we could use [exist_], because we do not need [ty2]. I
+             refrain from using it, just to simplify the paper. *)
         exist (fun v2 ->
           (* [w] must be the function type [v1 -> v2]. *)
           (* Here, we could use [^^], instead of [^&], so as to avoid building
-             a useless pair. I refrain from using it, just to simplify the paper. *)
+             a useless pair. *)
           w --- arrow v1 v2 ^&
-          (* Under the assumption that [x] has type [domain], the term [u] must
-             have type [codomain]. *)
+          (* Under the assumption that [x] has type [domain], the term [u]
+             must have type [codomain]. *)
           def x v1 (hastype u v2)
         )
       ) <$$> fun (ty1, (_ty2, ((), u'))) ->
@@ -231,12 +232,13 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
       let1 x (hastype t)
         (hastype u w)
       <$$> fun ((b, _), a, t', u') ->
-      (* [a] are the type variables that we must introduce (via Lambda-abstractions)
-         while type-checking [t]. [(b, _)] is the type scheme that [x] must receive
-         while type-checking [u]. Its quantifiers [b] are guaranteed to form a subset of
-         [a]. Hence, in general, we must re-bind [x] to an application of a suitable
-         coercion to [x]. We use smart constructors so that, if the lists [a] and
-         [b] happen to be equal, no extra code is produced. *)
+      (* [a] are the type variables that we must introduce (via Lambda
+         abstractions) while type-checking [t]. [(b, _)] is the type scheme
+         that [x] must receive while type-checking [u]. Its quantifiers [b]
+         are guaranteed to form a subset of [a]. Hence, in general, we must
+         re-bind [x] to an application of a suitable coercion to [x]. We use
+         smart constructors so that, if the lists [a] and [b] happen to be
+         equal, no extra code is produced. *)
       F.Let (x, F.ftyabs a t',
       flet (x, coerce a b (F.Var x),
       u'))
