@@ -198,9 +198,8 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
          are, so we must infer them. We introduce two type variables to stand
          for these unknowns. *)
       exist (fun v1 ->
-          (* Here, we could use [exist_], because we do not need [ty2]. I
-             refrain from using it, just to simplify the paper. *)
-        exist (fun v2 ->
+          (* Here, we use [exist_], because we do not need [ty2]. *)
+        exist_ (fun v2 ->
           (* [w] must be the function type [v1 -> v2]. *)
           (* Here, we could use [^^], instead of [^&], so as to avoid building
              a useless pair. *)
@@ -209,7 +208,7 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
              must have type [codomain]. *)
           def x v1 (hastype u v2)
         )
-      ) <$$> fun (ty1, (_ty2, ((), u'))) ->
+      ) <$$> fun (ty1, ((), u')) ->
       (* Once these constraints are solved, we obtain the translated function
          body [u']. There remains to construct an explicitly-typed abstraction
          in the target calculus. *)
