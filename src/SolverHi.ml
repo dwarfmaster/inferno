@@ -179,6 +179,15 @@ let instance x v =
        the user. *)
     List.map decode (WriteOnceRef.get witnesses)
 
+(* [instance_ x v] is equivalent to [instance x v <$$> ignore]. *)
+
+let instance_ x v =
+  let witnesses = WriteOnceRef.create() in
+  CInstance (x, v, witnesses),
+  fun _env ->
+    (* In the decoding phase, there is nothing to do. *)
+    ()
+
 (* -------------------------------------------------------------------------- *)
 
 (* Constraint abstractions. *)

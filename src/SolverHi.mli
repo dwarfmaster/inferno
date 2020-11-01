@@ -97,15 +97,6 @@ module Make
 
   (* ---------------------------------------------------------------------- *)
 
-  (* Variants of the above. *)
-
-  (* The following variants are used when one does not need access to the
-     witness. [exist_ body] is logically equivalent to [exist body <$$> snd]. *)
-  val exist_:                           (variable -> 'a co) -> 'a co
-  val construct_: variable structure -> (variable -> 'a co) -> 'a co
-
-  (* ---------------------------------------------------------------------- *)
-
   (* A utility. *)
 
   (* If [f] is a binary predicate whose second argument is a type variable,
@@ -122,6 +113,18 @@ module Make
      application of the constraint abstraction denoted by [x] to the variable
      [v]. *)
   val instance: tevar -> variable -> ty list co
+
+  (* ---------------------------------------------------------------------- *)
+
+  (* Variants of the above. *)
+
+  (* The following variants are used when one does not need access to the
+     witness. [exist_ body] is equivalent to [exist body <$$> snd]. *)
+  val exist_:                           (variable -> 'a co) -> 'a co
+  val construct_: variable structure -> (variable -> 'a co) -> 'a co
+
+  (* [instance_ x v] is equivalent to [instance x v <$$> ignore]. *)
+  val instance_: tevar -> variable -> unit co
 
   (* ---------------------------------------------------------------------- *)
 
