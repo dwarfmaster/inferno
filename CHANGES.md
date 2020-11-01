@@ -1,14 +1,15 @@
 # Changes
 
-## 2020/11/XX
+## 2020/11/01
 
 * In the solver's high-level API, define the type `deep_ty` of deep types,
   and introduce a new function `build`, which converts a deep type into a
   type variable, allowing it to appear in a constraint.
 
 * In the solver's high-level API, introduce a new function `instance_`. This
-  is a variant of `instance`. It is more convenient (and more efficient) when
-  one does not need to know how a type scheme was instantiated.
+  is a variant of `instance`. This function is more convenient (and more
+  efficient) than `instance` when one does not need to know how a type scheme
+  was instantiated.
 
 ## 2020/10/01
 
