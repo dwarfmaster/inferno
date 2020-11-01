@@ -92,7 +92,7 @@ module Make
 
   (* [construct t c] is analogous to [exist c], but additionally constrains
      the type variable [v] to be equal to the type [t]. So, it is really a
-     way of constructing a variable that stands for a shallow term. *)
+     way of constructing a variable that stands for a shallow type. *)
   val construct:  variable structure -> (variable -> 'a co) -> (ty * 'a) co
 
   (* ---------------------------------------------------------------------- *)
