@@ -175,9 +175,9 @@ let coerce (vs1 : O.tyvar list) (vs2 : O.tyvar list) : coercion =
    take place in different phases, but the code is written as if there was just
    one phase. *)
 
-(* The function [analyse] takes a source term [t] and an expected type [w].
-   No type environment is required, as everything is built into the constraint via
-   suitable combinators, such as [def]. *)
+(* The function [hastype] takes a source term [t] and an expected type [w]. No
+   type environment is required, as everything is built into the constraint
+   via suitable combinators, such as [def]. *)
 
 let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
 = match t with
