@@ -103,7 +103,9 @@ let arrow x y =
 let product xs =
   S.TyProduct xs
 
-(* Should we use smart constructors to eliminate redundant coercions when possible? *)
+(* Should we use smart constructors to eliminate redundant coercions when
+   possible? *)
+
 let smart =
   true
 
