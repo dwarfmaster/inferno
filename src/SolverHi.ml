@@ -111,8 +111,7 @@ let exist f =
     (decode v, k env)
 
 (* [construct] is identical to [exist], except [None] is replaced with
-   [Some t]. We do not factor out the common code, because we wish to
-   show only [exist] in the paper. *)
+   [Some t]. *)
 
 let construct t f =
   let v = fresh (Some t) in
