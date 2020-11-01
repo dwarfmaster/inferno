@@ -1,5 +1,11 @@
 # Changes
 
+## 2020/11/XX
+
+* In the solver's API, new function `instance_`,
+  a variant of `instance`, which is more convenient (and more efficient)
+  when one does not need to know how a type scheme was instantiated.
+
 ## 2020/10/01
 
 * Change the signature `SolverSig.OUTPUT` so as to make `tyvar` an abstract
