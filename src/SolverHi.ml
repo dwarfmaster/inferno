@@ -97,9 +97,9 @@ let (^^) (rc1, k1) (rc2, k2) =
 
 (* Existential quantification. *)
 
-let exist f =
+let exist_aux t f =
   (* Create a fresh unifier variable [v]. *)
-  let v = fresh None in
+  let v = fresh t in
   (* Pass [v] to the client. *)
   let rc, k = f v in
   (* Wrap the constraint [c] in an existential quantifier, *)
@@ -110,16 +110,11 @@ let exist f =
     let decode = env in
     (decode v, k env)
 
-(* [construct] is identical to [exist], except [None] is replaced with
-   [Some t]. *)
+let exist f =
+  exist_aux None f
 
 let construct t f =
-  let v = fresh (Some t) in
-  let rc, k = f v in
-  CExist (v, rc),
-  fun env ->
-    let decode = env in
-    (decode v, k env)
+  exist_aux (Some t) f
 
 let exist_aux_ t f =
   let v = fresh t in
