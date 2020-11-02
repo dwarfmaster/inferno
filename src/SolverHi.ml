@@ -326,8 +326,8 @@ end
 (* Solving, or running, a constraint. *)
 
 exception Unbound = Lo.Unbound
-exception Unify of O.ty * O.ty
-exception Cycle of O.ty
+exception Unify of range * O.ty * O.ty
+exception Cycle of range * O.ty
 
 let solve rectypes (rc, k) =
   assert (ok rc);
@@ -341,12 +341,12 @@ let solve rectypes (rc, k) =
        that the cyclic decoder is required here, even if [rectypes] is [false],
        as recursive types can appear before the occurs check is successfully
        run. *)
-  | Lo.Unify (v1, v2) ->
+  | Lo.Unify (range, v1, v2) ->
       let decode = new_decoder true (* cyclic decoder *) in
-      raise (Unify (decode v1, decode v2))
-  | Lo.Cycle v ->
+      raise (Unify (range, decode v1, decode v2))
+  | Lo.Cycle (range, v) ->
       let decode = new_decoder true (* cyclic decoder *) in
-      raise (Cycle (decode v))
+      raise (Cycle (range, decode v))
   end;
   (* Create a suitable decoder. *)
   let decode = new_decoder rectypes in

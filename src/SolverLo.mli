@@ -108,9 +108,9 @@ module Make
      and fills the write-once references that are embedded in the syntax of
      the constraint. *)
 
-  exception Unbound of tevar
-  exception Unify of variable * variable
-  exception Cycle of variable
+  exception Unbound of range * tevar
+  exception Unify of range * variable * variable
+  exception Cycle of range * variable
   val solve: bool -> rawco -> unit
 
   (* ---------------------------------------------------------------------- *)
