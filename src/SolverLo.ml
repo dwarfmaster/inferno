@@ -98,17 +98,18 @@ let solve (rectypes : bool) (c : rawco) : unit =
   let state = G.init() in
 
   (* The recursive function [solve] is parameterized with an environment
-     that maps term variables to type schemes. *)
+     (which maps term variables to type schemes) and with a range (it is the
+     range annotation that was most recently encountered on the way down). *)
 
-  let rec solve (env : ischeme XMap.t) (c : rawco) : unit =
+  let rec solve (env : ischeme XMap.t) range (c : rawco) : unit =
     match c with
-    | CRange (_range, c) ->
-        solve env c
+    | CRange (range, c) ->
+        solve env range c
     | CTrue ->
         ()
     | CConj (c1, c2) ->
-        solve env c1;
-        solve env c2
+        solve env range c1;
+        solve env range c2
     | CEq (v, w) ->
         U.unify v w
     | CExist (v, c) ->
@@ -116,7 +117,7 @@ let solve (rectypes : bool) (c : rawco) : unit =
            is globally unique, it carries no structure, and its rank is
            [no_rank]. The combinator interface enforces this property. *)
         G.register state v;
-        solve env c
+        solve env range c
     | CInstance (x, w, witnesses_hook) ->
         (* The environment provides a type scheme for [x]. *)
         let s = try XMap.find x env with Not_found -> raise (Unbound x) in
@@ -127,7 +128,8 @@ let solve (rectypes : bool) (c : rawco) : unit =
         WriteOnceRef.set witnesses_hook witnesses;
         U.unify v w
     | CDef (x, v, c) ->
-        solve (XMap.add x (G.trivial v) env) c
+        let env = XMap.add x (G.trivial v) env in
+        solve env range c
     | CLet (xvss, c1, c2, generalizable_hook) ->
         (* Warn the generalization engine that we entering the left-hand side of
            a [let] construct. *)
@@ -138,7 +140,7 @@ let solve (rectypes : bool) (c : rawco) : unit =
         let vs = List.map (fun (_, v, _) -> v) xvss in
         List.iter (G.register state) vs;
         (* Solve the constraint [c1]. *)
-        solve env c1;
+        solve env range c1;
         (* Ask the generalization engine to perform an occurs check, to adjust the
            ranks of the type variables in the young generation (i.e., all of the
            type variables that were registered since the call to [G.enter] above),
@@ -157,10 +159,12 @@ let solve (rectypes : bool) (c : rawco) : unit =
           ) env xvss ss
         in
         (* Proceed to solve [c2] in the extended environment. *)
-        solve env c2
+        solve env range c2
 
   in
-  solve XMap.empty c
+  let env = XMap.empty
+  and range = Lexing.(dummy_pos, dummy_pos) in
+  solve env range c
 
 (* -------------------------------------------------------------------------- *)
 
