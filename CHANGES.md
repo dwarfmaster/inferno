@@ -1,6 +1,11 @@
 # Changes
 
-## 2020/11/01
+## 2020/11/02
+
+* In the solver's high-level API, introduce a new combinator `range`, which
+  allows annotating a constraint with a range of source code positions.
+  **Incompatible change:** the exceptions `Unbound`, `Unify`, and `Cycle`
+  now carry a range.
 
 * In the solver's high-level API, define the type `deep_ty` of deep types,
   and introduce a new function `build`, which converts a deep type into a
