@@ -6,6 +6,11 @@
   be removed, and `exist_` can be renamed to `exist`. Same thing for
   `construct` and `construct_`. (I don't see how to simplify `instance`.)
 
+* Ask the user to provide a `traverse` function
+  (over the CPS applicative)
+  instead of (in addition to)
+  `map`, `fold`, `iter`?
+
 * Document the requirement that the function passed to `map` must be pure.
   Use this hypothesis to remove the useless evaluation of `k1 env` in the
   definition of `^^`.
