@@ -21,10 +21,18 @@
 
 * Think about type error reporting.
   - Keep track of type variable names.
+  - Possibly keep track of source code ranges in the type structure
+    (not just in the constraints)?
   - Possibly implement several solvers with different strategies.
   - Possibly continue after a unification error (just not unifying this
     particular pair of types) and report a list of mismatches at the end.
   - Compute a minimal type error slice?
+  - Of course let-polymorphism makes this more difficult.
+    Could we naively expand every (unannotated) let construct
+    so as to eliminate this difficulty?
+  - Is it conceivable to solve a constraint twice using two distinct
+    solvers? That might involve removing all of the mutable state
+    that explicitly hangs off a constraint.
 
 * Add a proper test suite, including positive and negative tests!
 
