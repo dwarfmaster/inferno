@@ -61,7 +61,11 @@ let fresh t =
    but not in the high-level interface [SolverHi]. So, it could be easily
    modified if desired. *)
 
+type range =
+  Lexing.position * Lexing.position
+
 type rawco =
+  | CRange of range * rawco
   | CTrue
   | CConj of rawco * rawco
   | CEq of variable * variable
@@ -98,6 +102,8 @@ let solve (rectypes : bool) (c : rawco) : unit =
 
   let rec solve (env : ischeme XMap.t) (c : rawco) : unit =
     match c with
+    | CRange (_range, c) ->
+        solve env c
     | CTrue ->
         ()
     | CConj (c1, c2) ->
@@ -223,4 +229,3 @@ let decode_scheme decode (s : ischeme) : O.scheme =
   decode (G.body s)
 
 end
-

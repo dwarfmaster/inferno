@@ -292,6 +292,16 @@ let let0 c1 =
 
 (* -------------------------------------------------------------------------- *)
 
+(* Correlation with the source code. *)
+
+type range =
+  Lexing.position * Lexing.position
+
+let correlate range (rc, k) =
+  CRange (range, rc), k
+
+(* -------------------------------------------------------------------------- *)
+
 (* Running a constraint. *)
 
 (* The constraint [c] should have been constructed by [let0], otherwise we

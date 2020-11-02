@@ -42,11 +42,19 @@ module Make
   val fresh: variable structure option -> variable
 
   (* The type [ischeme] describes the solver's type schemes. *)
-
   type ischeme
+
+  (* The type [range] describes a range in the source code.
+     It is not interpreted by the solver. It is used only
+     as part of error reports. *)
+  type range =
+    Lexing.position * Lexing.position
 
   (* The syntax of constraints is as follows. *)
   type rawco =
+
+    (* Range information. *)
+  | CRange of range * rawco
 
     (* Truth. *)
   | CTrue

@@ -174,6 +174,19 @@ module Make
 
   (* ---------------------------------------------------------------------- *)
 
+  (* Correlation with the source code. *)
+
+  (* The type [range] describes a range in the source code. *)
+  type range =
+    Lexing.position * Lexing.position
+
+  (* The constraint [correlate range c] is equivalent to [c], but records
+     that this constraint is correlated with the range [range] in the
+     source code. This information is used in error reports. *)
+  val correlate: range -> 'a co -> 'a co
+
+  (* ---------------------------------------------------------------------- *)
+
   (* Evaluation. *)
 
   (* [solve rectypes c] evaluates the constraint [c]. The flag [rectypes] tells
