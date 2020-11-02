@@ -1,3 +1,5 @@
+* Use `odoc` to publish a documentation.
+
 * Offer a combinator `decode` of type `variable -> ty co` which requests
   the decoding of a type variable. If we have this, then we can remove
   or simplify the combinators that perform decoding. E.g., `exist` can
