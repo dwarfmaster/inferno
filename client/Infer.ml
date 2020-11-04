@@ -289,6 +289,7 @@ let rec hastype (t : ML.term) (w : variable) : F.nominal_term co
 (* The top-level wrapper uses [let0]. It does not require an expected
    type; it creates its own using [exist]. And it runs the solver. *)
 
+type range = Solver.range
 exception Unbound = Solver.Unbound
 exception Unify = Solver.Unify
 exception Cycle = Solver.Cycle
