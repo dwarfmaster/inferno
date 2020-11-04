@@ -1,6 +1,6 @@
 # Changes
 
-## 2020/11/02
+## 2020/11/04
 
 * In the solver's high-level API, introduce a new combinator `range`, which
   allows annotating a constraint with a range of source code positions.
